@@ -21,7 +21,7 @@ class IngestedFile:
     duplicate_of: str | None = None
 
 
-SUPPORTED_EXTENSIONS = (".pdf",)
+SUPPORTED_EXTENSIONS = (".pdf", ".docx")
 
 
 def ingest_directory(input_dir: str) -> list[IngestedFile]:

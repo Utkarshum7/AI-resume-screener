@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from src.config import Config  # noqa: E402
 from src.models import PipelineResult  # noqa: E402
 from src.pipeline import run_pipeline  # noqa: E402
+from src.report import generate_report  # noqa: E402
 
 
 def _print_summary(result: PipelineResult, output_path: str) -> None:
@@ -61,6 +62,8 @@ def main() -> int:
     parser.add_argument("--input", required=True, help="Directory containing candidate resume PDFs")
     parser.add_argument("--output", required=True, help="Path to write results.json")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
+    parser.add_argument("--report", action="store_true",
+                         help="Also generate a static HTML report (output/report.html) alongside the JSON output")
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -90,6 +93,12 @@ def main() -> int:
         s.eligible, s.rejected, args.output,
     )
     _print_summary(result, args.output)
+
+    if args.report:
+        report_path = os.path.join(os.path.dirname(os.path.abspath(args.output)) or ".", "report.html")
+        generate_report(args.output, report_path)
+        logger.info("HTML report written to: %s", report_path)
+
     return 0
 
 

@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 
 from src.config import Config
+from src.docx_extract import extract_docx
 from src.eligibility import evaluate_eligibility
 from src.extract_fields import extract_fields
 from src.github_enrich import enrich_github, new_cache
@@ -45,15 +46,18 @@ def run_pipeline(input_dir: str, config: Config | None = None) -> PipelineResult
             candidates.append(result)
             continue
 
-        pdf_result = extract_pdf(f.path)
-        if not pdf_result.ok:
+        if f.filename.lower().endswith(".docx"):
+            file_result = extract_docx(f.path)
+        else:
+            file_result = extract_pdf(f.path)
+        if not file_result.ok:
             result.parse_status = "failed"
-            result.parse_error = pdf_result.error
+            result.parse_error = file_result.error
             candidates.append(result)
             continue
 
         try:
-            fields = extract_fields(pdf_result.text, pdf_result.hyperlinks)
+            fields = extract_fields(file_result.text, file_result.hyperlinks)
         except Exception as e:  # noqa: BLE001 - extraction bug must not kill the batch
             result.parse_status = "failed"
             result.parse_error = f"field_extraction_failed: {e}"
