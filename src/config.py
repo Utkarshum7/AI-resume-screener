@@ -88,7 +88,7 @@ class LLMConfig:
         default_factory=lambda: os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     )
     gemini_model: str = field(
-        default_factory=lambda: os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+        default_factory=lambda: os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
     )
     anthropic_api_key: str | None = field(default_factory=lambda: os.environ.get("ANTHROPIC_API_KEY"))
     openai_api_key: str | None = field(default_factory=lambda: os.environ.get("OPENAI_API_KEY"))

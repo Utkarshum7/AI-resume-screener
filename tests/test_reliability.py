@@ -1,8 +1,9 @@
 import os
-import shutil
 import sys
 import tempfile
 from unittest.mock import patch
+
+import docx
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -11,7 +12,18 @@ from src.llm_adapter import LLMCallError
 from src.models import GitHubEnrichment
 from src.pipeline import run_pipeline
 
-_REAL_RESUME_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "resumes")
+
+def _write_synthetic_eligible_resume(path: str) -> None:
+    """Fictional resume that passes the Python + AI eligibility gate."""
+    document = docx.Document()
+    document.add_paragraph("Test Candidate")
+    document.add_paragraph("test.candidate@example.com")
+    document.add_paragraph("Skills: Python, FastAPI, PostgreSQL, Docker")
+    document.add_paragraph(
+        "Project: Built a RAG pipeline with LangChain and vector embeddings, "
+        "served through a FastAPI backend."
+    )
+    document.save(path)
 
 
 def test_corrupted_pdf_does_not_kill_batch():
@@ -34,15 +46,11 @@ def test_llm_failure_does_not_kill_batch_and_uses_fallback():
     # on "no provider configured" (which is no longer true now that a real
     # GEMINI_API_KEY exists in .env, and would otherwise make a real network
     # call here). No network/API call of any kind occurs in this test.
-    known_eligible_resume = os.path.join(_REAL_RESUME_DIR, "candidate_30.pdf")
-    assert os.path.exists(known_eligible_resume), "fixture resume missing from resumes/"
-
     with tempfile.TemporaryDirectory() as tmp:
-        shutil.copy(known_eligible_resume, os.path.join(tmp, "candidate_30.pdf"))
+        _write_synthetic_eligible_resume(os.path.join(tmp, "synthetic_candidate.docx"))
 
-        # candidate_30.pdf also contains a real GitHub link; enrich_github runs
-        # for every candidate regardless of eligibility, so it is stubbed too
-        # to guarantee this test makes zero network calls of any kind.
+        # enrich_github runs for every candidate regardless of eligibility, so
+        # it is stubbed too to guarantee this test makes zero network calls.
         with patch("src.pipeline.extract_with_llm", side_effect=LLMCallError("simulated_failure_for_test")), \
              patch("src.pipeline.enrich_github", return_value=GitHubEnrichment(status="not_provided")):
             result = run_pipeline(tmp, Config())

@@ -1,1 +1,33 @@
+# Secrets — never commit real credentials (.env.example is the template)
 .env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Candidate data and generated outputs contain personal information.
+# Only the placeholder READMEs in these folders are tracked.
+resumes/*
+!resumes/README.md
+output/*
+!output/README.md
