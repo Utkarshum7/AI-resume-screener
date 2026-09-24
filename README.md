@@ -507,8 +507,8 @@ Requires Python 3.10+ (the code uses `X | None` type syntax); developed with Pyt
 **1. Clone the repository**
 
 ```bash
-git clone https://github.com/Utkarshum7/kasparro-ai-resume-screener.git
-cd kasparro-ai-resume-screener
+git clone https://github.com/Utkarshum7/AI-resume-screener.git
+cd AI-resume-screener
 ```
 
 **2. Create and activate a virtual environment**
